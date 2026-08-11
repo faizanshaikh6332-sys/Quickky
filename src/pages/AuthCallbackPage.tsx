@@ -40,8 +40,9 @@ export default function AuthCallbackPage() {
           // Ensure a profile exists for the new user
           await ensureProfile(session.user);
           setStatus('success');
-          // Short delay so the user sees the success state
-          setTimeout(() => navigate('/', { replace: true }), 800);
+          // Check if user is an admin to redirect appropriately
+          const redirectTarget = await getRedirectTarget(session.user.id);
+          setTimeout(() => navigate(redirectTarget, { replace: true }), 800);
         }
       }
     );
@@ -56,7 +57,8 @@ export default function AuthCallbackPage() {
       } else if (session) {
         await ensureProfile(session.user);
         setStatus('success');
-        setTimeout(() => navigate('/', { replace: true }), 800);
+        const redirectTarget = await getRedirectTarget(session.user.id);
+        setTimeout(() => navigate(redirectTarget, { replace: true }), 800);
       } else {
         // No session and no error — might still be processing,
         // give it more time
@@ -202,4 +204,22 @@ async function ensureProfile(user: { id: string; email?: string; phone?: string;
     // Non-critical — profile will be created/updated on next page load
     console.warn('Profile sync warning:', err);
   }
+}
+
+/**
+ * Determines where to redirect the user after OAuth callback.
+ * Admins go to /admin/dashboard, everyone else goes to /.
+ */
+async function getRedirectTarget(userId: string): Promise<string> {
+  try {
+    const { data } = await supabase
+      .from('admin_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .single();
+    if (data?.role) return '/admin/dashboard';
+  } catch {
+    // Not an admin — fall through
+  }
+  return '/';
 }
