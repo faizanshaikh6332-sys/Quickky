@@ -129,21 +129,51 @@ export default function AuthModal({ open, onClose, onSuccess }: AuthModalProps) 
 
   // ── Email Auth ────────────────────────────────────
   const handleEmail = async () => {
-    if (!email || !password) return toast.error('Fill in all fields');
+    if (!email.trim() || !password) return toast.error('Please enter email and password');
+    if (isSignUp && !fullName.trim()) return toast.error('Please enter your full name');
+
     setLoading(true);
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({
-        email, password,
-        options: { data: { full_name: fullName } },
-      });
+    try {
+      if (isSignUp) {
+        const { data, error } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: {
+            data: {
+              full_name: fullName.trim(),
+              role: 'customer',
+            },
+          },
+        });
+        setLoading(false);
+
+        if (error) {
+          toast.error(error.message);
+        } else if (data?.session) {
+          toast.success('Account created! Welcome to Quickky 🎉');
+          onSuccess?.();
+          handleClose();
+        } else if (data?.user) {
+          toast.success('Account created! Please check your email for a confirmation link.');
+          handleClose();
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+        setLoading(false);
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success('Welcome back! 👋');
+          onSuccess?.();
+          handleClose();
+        }
+      }
+    } catch (err: any) {
       setLoading(false);
-      if (error) toast.error(error.message);
-      else { toast.success('Check your email to confirm signup!'); handleClose(); }
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      setLoading(false);
-      if (error) toast.error(error.message);
-      else { toast.success('Welcome back! 👋'); onSuccess?.(); handleClose(); }
+      toast.error(err.message || 'Authentication failed. Please try again.');
     }
   };
 

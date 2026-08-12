@@ -153,6 +153,32 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* ─── Seller Portal — full-screen, no customer layout ──────────────── */}
+        <Route path="/seller/register" element={<SellerRegister />} />
+        <Route path="/seller/login" element={<SellerLogin />} />
+        <Route path="/seller/dashboard" element={<SellerDashboard />} />
+
+        {/* ─── Admin Portal — full-screen, separate app ─────────────────────── */}
+        <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/shops" element={<ShopsPage />} />
+        <Route path="/admin/sellers" element={<SellersPage />} />
+        <Route path="/admin/products" element={<ProductsPage />} />
+        <Route path="/admin/categories" element={<CategoriesPage />} />
+        <Route path="/admin/orders" element={<OrdersPage />} />
+        <Route path="/admin/coupons" element={<CouponsPage />} />
+        <Route path="/admin/banners" element={<BannersPage />} />
+        <Route path="/admin/customers" element={<CustomersPage />} />
+        <Route path="/admin/notifications" element={<NotificationsPage />} />
+        <Route path="/admin/settings" element={<SettingsPage />} />
+        <Route path="/admin/reports" element={<ReportsPage />} />
+        <Route path="/admin/logs" element={<AdminLogsPage />} />
+
+        {/* Auth callback for Google OAuth */}
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+
+        {/* ─── Customer Website — with Navbar/Footer layout ─────────────────── */}
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/category/:slug" element={<CategoryPage />} />
@@ -180,33 +206,12 @@ export default function App() {
           <Route path="/stores" element={<StorePage />} />
           <Route path="/orders" element={<ProtectedRoute><OrderHistoryPage /></ProtectedRoute>} />
           <Route path="/addresses" element={<ProtectedRoute><AddressesPage /></ProtectedRoute>} />
-          <Route path="*" element={<NotFoundPage />} />
         </Route>
 
-        {/* ─── Seller Portal — full-screen, no customer layout ──────────────── */}
-        <Route path="/seller/register" element={<SellerRegister />} />
-        <Route path="/seller/login" element={<SellerLogin />} />
-        <Route path="/seller/dashboard" element={<SellerDashboard />} />
-
-        {/* ─── Admin Portal — full-screen, separate app ─────────────────────── */}
-        <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/shops" element={<ShopsPage />} />
-        <Route path="/admin/sellers" element={<SellersPage />} />
-        <Route path="/admin/products" element={<ProductsPage />} />
-        <Route path="/admin/categories" element={<CategoriesPage />} />
-        <Route path="/admin/orders" element={<OrdersPage />} />
-        <Route path="/admin/coupons" element={<CouponsPage />} />
-        <Route path="/admin/banners" element={<BannersPage />} />
-        <Route path="/admin/customers" element={<CustomersPage />} />
-        <Route path="/admin/notifications" element={<NotificationsPage />} />
-        <Route path="/admin/settings" element={<SettingsPage />} />
-        <Route path="/admin/reports" element={<ReportsPage />} />
-        <Route path="/admin/logs" element={<AdminLogsPage />} />
-
-        {/* Auth callback for Google OAuth */}
-        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        {/* ─── Catch-all 404 — MUST be last, outside Layout ─────────────────── */}
+        <Route path="*" element={<Layout />}>
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

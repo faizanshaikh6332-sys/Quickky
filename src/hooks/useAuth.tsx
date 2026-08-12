@@ -76,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: authUser.email || null,
           phone: authUser.phone || null,
           avatar_url: meta.avatar_url || meta.picture || null,
+          role: 'customer',
         })
         .select('*')
         .single();
