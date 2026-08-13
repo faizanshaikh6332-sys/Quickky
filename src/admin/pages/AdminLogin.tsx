@@ -95,6 +95,37 @@ export default function AdminLogin() {
     duration: Math.random() * 20 + 10,
   }));
 
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const targetEmail = (resetEmail || email).trim();
+    if (!targetEmail) {
+      toast.error('Please enter your email address');
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(targetEmail, {
+        redirectTo: window.location.origin + '/admin/reset-password',
+      });
+
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success(`Password reset link sent to ${targetEmail}`);
+        setShowForgotModal(false);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to send password reset email');
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-gray-950 via-purple-950/20 to-gray-950 flex flex-col items-center justify-center p-4">
       {/* Animated Background Particles */}
@@ -136,11 +167,9 @@ export default function AdminLogin() {
               alt="Quickky Logo" 
               className="h-12 mb-6"
               onError={(e) => {
-                // Fallback if logo not found
                 e.currentTarget.style.display = 'none';
               }}
             />
-            {/* Fallback text if logo fails or just alongside */}
             <h1 className="text-3xl font-black text-white tracking-tight">Admin Portal</h1>
             <p className="text-purple-400 mt-1 font-medium">Quickky Control Center</p>
           </div>
@@ -181,6 +210,18 @@ export default function AdminLogin() {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setResetEmail(email);
+                    setShowForgotModal(true);
+                  }}
+                  className="text-xs text-purple-400 hover:text-purple-300 transition-colors font-medium"
+                >
+                  Forgot Password?
                 </button>
               </div>
             </div>
@@ -241,6 +282,56 @@ export default function AdminLogin() {
           Quickky Admin v1.0 · Secure Access
         </p>
       </motion.div>
+
+      {/* Forgot Password Modal */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-gray-900 border border-white/10 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative"
+          >
+            <h3 className="text-xl font-bold text-white mb-2">Reset Admin Password</h3>
+            <p className="text-sm text-gray-400 mb-6">
+              Enter your verified admin email address. We will send you a secure link to reset your password.
+            </p>
+
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-300 uppercase tracking-wide mb-1">
+                  Admin Email
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  placeholder="admin@quickky.com"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 text-sm outline-none focus:border-purple-500 transition-all"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowForgotModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 text-sm font-semibold transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={resetLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold transition-all disabled:opacity-50"
+                >
+                  {resetLoading ? 'Sending...' : 'Send Link'}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

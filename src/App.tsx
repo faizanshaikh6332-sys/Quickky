@@ -20,6 +20,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 // ─── Admin Portal Imports ────────────────────────────────────────────────────
 import AdminLogin from '@/admin/pages/AdminLogin';
+import AdminResetPassword from '@/admin/pages/AdminResetPassword';
 import AdminDashboard from '@/admin/pages/AdminDashboard';
 import ShopsPage from '@/admin/pages/ShopsPage';
 import SellersPage from '@/admin/pages/SellersPage';
@@ -161,6 +162,7 @@ export default function App() {
         {/* ─── Admin Portal — full-screen, separate app ─────────────────────── */}
         <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/reset-password" element={<AdminResetPassword />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/shops" element={<ShopsPage />} />
         <Route path="/admin/sellers" element={<SellersPage />} />
