@@ -36,7 +36,20 @@ export default function AuthCallbackPage() {
     // Listen for the auth state change that fires when the code is exchanged
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          navigate('/admin/reset-password', { replace: true });
+          return;
+        }
+
         if (event === 'SIGNED_IN' && session) {
+          // Check if session contains type=recovery or password reset request
+          const hash = window.location.hash;
+          const search = window.location.search;
+          if (hash.includes('type=recovery') || search.includes('type=recovery')) {
+            navigate('/admin/reset-password', { replace: true });
+            return;
+          }
+
           // Ensure a profile exists for the new user
           await ensureProfile(session.user);
           setStatus('success');

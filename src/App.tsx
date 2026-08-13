@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import Layout from '@/components/layout/Layout';
 import HomePage from '@/pages/Home';
 import CategoryPage from '@/pages/CategoryPage';
@@ -153,6 +154,7 @@ For questions, contact: privacy@quickky.in`;
 export default function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-right" />
       <Routes>
         {/* ─── Seller Portal — full-screen, no customer layout ──────────────── */}
         <Route path="/seller/register" element={<SellerRegister />} />
